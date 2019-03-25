@@ -1,0 +1,36 @@
+#!/bin/bash
+
+DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+HUBUSER=devcamaws
+
+
+sudo docker service create --name=viz --publish=8080:8080 \
+            --constraint=node.role==manager \
+            --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock dockersamples/visualizer
+
+
+docker network create -d overlay overlay
+
+
+cd $DIRECTORY/filedocker/db2/
+
+docker build -t db2 .
+wait
+
+docker tag db2 $HUBUSER/db2
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/db2
+wait
+
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+docker service create --name db2 -d -p 50000:50000 \
+            --network overlay \
+            --constraint=node.role==worker \
+            --env-file $DIRECTORY/filedocker/db2/db2-env \
+            --entrypoint "/bin/bash -c 'chmod -R 777 /for_db2/ && /for_db2/bash && while i=1;do sleep 1000; done;'" \
+            --with-registry-auth \
+            -d $HUBUSER/db2:latest

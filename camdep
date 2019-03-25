@@ -1,0 +1,68 @@
+#!/bin/bash
+
+DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+HUBUSER=devcamaws
+
+docker rmi camunda/camunda-bpm-platform
+docker rmi $HUBUSER/$1
+
+cd $DIRECTORY/filedocker/camunda/
+
+docker build -t $1 .
+
+docker tag $1 $HUBUSER/$1
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/$1
+
+
+docker service create --name $1 \
+            --with-registry-auth \
+            --network overlay \
+            --replicas $2 \
+            --constraint=node.role==worker \
+            --endpoint-mode dnsrr \
+            --env-file $DIRECTORY/filedocker/camunda/camunda-env \
+            -d $HUBUSER/$1 ./camunda.sh
+
+for ((;;))
+do
+echo "loop, CTRL+C for exit"
+if [ "$(docker service logs $1 2>&1|grep 'Server startup in'|wc -l)" == $2 ]
+then break
+else 
+echo 'wait '$1''
+sleep 5
+fi
+done
+
+if echo "$(cat $DIRECTORY/filedocker/nginx/nginx/nginx.conf)"|grep -q -s -F 'server '$1':'
+then echo !!!
+else
+sed -i '/upstream backend_hosts {ip_hash;/a \  server '$1':8080;' $DIRECTORY/filedocker/nginx/nginx/nginx.conf
+fi
+
+cd $DIRECTORY/filedocker/nginx/
+
+docker rmi nginx
+docker rmi $HUBUSER/nginx
+
+docker build -t nginx .
+wait
+
+docker tag nginx $HUBUSER/nginx
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/nginx
+wait
+
+docker service rm nginx
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+docker service create --name nginx -p 80:80 \
+            --constraint=node.role==worker \
+            --network overlay \
+            --with-registry-auth \
+            -d $HUBUSER/nginx:latest

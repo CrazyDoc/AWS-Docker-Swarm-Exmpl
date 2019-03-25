@@ -1,0 +1,14 @@
+CASSANDRA_TRANSPORT_PORT_NUMBER: Inter-node cluster communication port. Default: 7000
+CASSANDRA_JMX_PORT_NUMBER: JMX connections port. Default: 7199
+CASSANDRA_CQL_PORT_NUMBER: Client port. Default: 9042.
+CASSANDRA_USER: Cassandra user name. Defaults: cassandra
+CASSANDRA_PASSWORD_SEEDER: Password seeder will change the Cassandra default credentials at initialization. In clusters, only one node should be marked as password seeder. Default: no
+CASSANDRA_PASSWORD: Cassandra user password. Default: cassandra
+CASSANDRA_NUM_TOKENS: Number of tokens for the node. Default: 256.
+CASSANDRA_HOST: Hostname used to configure Cassandra. It can be either an IP or a domain. If left empty, it will be resolved to the machine IP.
+CASSANDRA_CLUSTER_NAME: Cluster name to configure Cassandra.. Defaults: My Cluster
+CASSANDRA_SEEDS: Hosts that will act as Cassandra seeds. No defaults.
+CASSANDRA_ENDPOINT_SNITCH: Snitch name (which determines which data centers and racks nodes belong to). Default SimpleSnitch
+CASSANDRA_ENABLE_RPC: Enable the thrift RPC endpoint. Default :true
+CASSANDRA_DATACENTER: Datacenter name for the cluster. Ignored in SimpleSnitch endpoint snitch. Default: dc1.
+CASSANDRA_RACK: Rack name for the cluster. Ignored in SimpleSnitch endpoint snitch. Default: rack

@@ -1,0 +1,5 @@
+FROM nginx
+ADD /html /usr/share/nginx/html/
+ADD /nginx/ /etc/nginx/
+#ADD /conf /var/nginx/conf			for conf
+#ADD /www/ /var/www/      			for content

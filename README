@@ -1,0 +1,11 @@
+Simple deploy Camunda+DB2+NGINX
+
+For use it:
+1) Create SSH keys.
+2) Use template https://editions-us-east-1.s3.amazonaws.com/aws/stable/Docker.tmpl 
+   in CloudFormation AWS(just add ssh key and click next, next, igre, create).
+3) Wait "CREATE_COMPLETE" for your stack in CloudFormation panel.
+4) Use DNS name Manager instance(any, in EC2 panel - instances) to SSH connect(user name - docker).
+5) Copy project, run firstdep(viz:8080, db2) and camdep(/camunda). EXAMPLE for camdep: 
+"/bin/bash /path_to_script/camdep [service_name] [replic counts]"
+6) Use DNS name Load Balancer in EC2 panel to check project: DNS:80, DNS/camunda, DNS:8080.

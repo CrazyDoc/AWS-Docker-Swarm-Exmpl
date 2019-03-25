@@ -1,0 +1,6 @@
+DB_DRIVER=com.ibm.db2.jcc.DB2Driver
+DB_URL=jdbc:db2://db2:50000/camunda
+DB_USERNAME=db2inst1
+DB_PASSWORD=bv-pwd
+WAIT_FOR=db2:50000
+WAIT_FOR_TIMEOUT=120

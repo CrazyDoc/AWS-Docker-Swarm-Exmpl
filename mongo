@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Example: "/bin/bash /home/docker/mongo mongo 1
+
+docker network create -d overlay overlay
+
+DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+HUBUSER=devcamaws
+
+docker rmi mongo
+docker rmi $HUBUSER/$1
+
+cd $DIRECTORY/filedocker/mongo/
+
+docker build -t $1 .
+
+docker tag $1 $HUBUSER/$1
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/$1
+
+
+docker service create --name $1 -p 27017:27017 \
+            --with-registry-auth \
+            --network overlay \
+            --constraint=node.role==worker \
+            --endpoint-mode dnsrr \
+            --env-file $DIRECTORY/filedocker/mongo/mongo-env \
+            -d $HUBUSER/$1

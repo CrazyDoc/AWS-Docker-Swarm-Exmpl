@@ -1,0 +1,5 @@
+ONGO_INITDB_ROOT_USERNAME
+MONGO_INITDB_ROOT_PASSWORD
+These variables, used in conjunction, create a new user and set that user's password. This user is created in the admin authentication database and given the role of root. Both variables are required for a user to be created. If both are present then MongoDB will start with authentication enabled: mongod --auth. Authentication in MongoDB is fairly complex, so more complex user setup is explicitly left to the user via /docker-entrypoint-initdb.d/ (see Initializing a fresh instance below). The following is an example of using these two variables to create a MongoDB instance and then using the mongo cli to connect against the admin authentication database.
+MONGO_INITDB_DATABASE
+This variable allows you to specify the name of a database to be used for creation scripts in /docker-entrypoint-initdb.d/*.js (see Initializing a fresh instance below). MongoDB is fundamentally designed for "create on first use", so if you do not insert data with your JavaScript files, then no database is created.

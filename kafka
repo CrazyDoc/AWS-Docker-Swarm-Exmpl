@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Example: "/bin/bash /home/docker/kafka kafka 1
+
+# pls use service name "kafka" or change name in env "//kafka:9092" 
+
+DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+HUBUSER=devcamaws
+
+docker rmi zookeeper
+docker rmi $HUBUSER/zookeeper
+
+cd $DIRECTORY/filedocker/zookeeper/
+
+docker build -t $1 .
+
+docker tag $1 $HUBUSER/zookeeper
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/zookeeper
+
+
+docker service create --name zookeeper \
+            --with-registry-auth \
+            --network overlay \
+            --constraint=node.role==worker \
+            --endpoint-mode dnsrr \
+            --env-file $DIRECTORY/filedocker/zookeeper/zookeeper-env \
+            -d $HUBUSER/zookeeper
+
+docker rmi wurstmeister/kafka
+docker rmi $HUBUSER/$1
+
+cd $DIRECTORY/filedocker/kafka/
+
+docker build -t $1 .
+
+docker tag $1 $HUBUSER/$1
+
+cat $DIRECTORY/hubdockpass | docker login --username $HUBUSER --password-stdin
+
+docker push $HUBUSER/$1
+
+
+docker service create --name $1 \
+            --with-registry-auth \
+            --network overlay \
+            --constraint=node.role==worker \
+            --endpoint-mode dnsrr \
+            --env-file $DIRECTORY/filedocker/kafka/kafka-env \
+            -d $HUBUSER/$1

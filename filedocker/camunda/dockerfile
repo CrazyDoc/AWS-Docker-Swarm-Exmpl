@@ -1,0 +1,6 @@
+FROM camunda/camunda-bpm-platform:latest
+ADD /lib/db2jcc.jar /camunda/lib/
+ADD /conf/bpm-platform.xml /camunda/conf/bpm-platform.xml
+ADD /conf/catalina.properties /camunda/conf/catalina.properties
+ADD /conf/logging.properties /camunda/conf/logging.properties
+ADD /webapps/test-0-160ms-0.1.0-SNAPSHOT.war /camunda/webapps/test-0-160ms-0.1.0-SNAPSHOT.war

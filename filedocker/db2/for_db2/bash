@@ -1,0 +1,19 @@
+#!/bin/bash
+
+database=camunda #set database name to sql scripts
+
+su - root -c 'echo "bv-pwd" |passwd --stdin db2inst1'
+
+su - db2inst1 -c "db2start"
+
+/for_db2/wait localhost:50000 -t 0 #"-t 0" wait db2 whithout timeout
+
+su - db2inst1 -c "db2 CREATE DATABASE camunda AUTOMATIC STORAGE YES PAGESIZE 32768"
+
+su - db2inst1 -c "db2 connect to $database && db2 -tvf /for_db2/db2_engine_7.10.0.sql"
+
+su - db2inst1 -c "db2 connect to $database && db2 -tvf /for_db2/db2_identity_7.10.0.sql"
+
+
+
+

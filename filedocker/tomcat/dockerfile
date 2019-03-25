@@ -1,0 +1,2 @@
+FROM tomcat:latest
+ADD /conf/tomcat-users.xml /tomcat/conf/tomcat-users.xml
