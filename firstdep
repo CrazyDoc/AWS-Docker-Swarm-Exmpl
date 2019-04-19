@@ -31,6 +31,7 @@ docker service create --name db2 -d -p 50000:50000 \
             --network overlay \
             --constraint=node.role==worker \
             --env-file $DIRECTORY/filedocker/db2/db2-env \
+#trick to work around the NUMA problem in small EC2 machines. use only for tests.
             --entrypoint "/bin/bash -c 'chmod -R 777 /for_db2/ && /for_db2/bash && while i=1;do sleep 1000; done;'" \
             --with-registry-auth \
             -d $HUBUSER/db2:latest
